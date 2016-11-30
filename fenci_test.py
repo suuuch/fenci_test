@@ -8,13 +8,13 @@ class fenci_test(object):
         pass
 
     def clean_url(self, input_str):
-        reobj = re.compile('[a-zA-z]+://[^\s|\u4e00-\u9fa5]*')
+        reobj = re.compile(r'[a-zA-z]+://[^\s|\u4e00-\u9fa5]*')
         result, number = reobj.subn(' ', input_str)
         # print(number)
         return result
 
     def clean_email(self, input_str):
-        reobj = re.compile('\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*')
+        reobj = re.compile(r'\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*')
         result, number = reobj.subn(' ', input_str)
         # print(number)
         return result
@@ -26,7 +26,7 @@ class fenci_test(object):
         return result
 
     def clean_special_char(self, input_str):
-        reobj = re.compile('[^\u4e00-\u9fa5|,|;|:|\w]')
+        reobj = re.compile(r'[^\u4e00-\u9fa5|,|;|:|\w]')
         result, number = reobj.subn(' ', input_str)
         # print(number)
         return result
@@ -47,6 +47,11 @@ class fenci_test(object):
             return map(lambda x: x.lower(), input_str_list)
         else:
             assert 'input str should be list!'
+
+    def clean_stopwords(self, input_str_list):
+        stopwords = [ line.rstrip() for line in open('english_stopword.txt',encoding='utf-8') ]
+        stopwords += [ line.rstrip() for line in open('chinese_stopword.txt',encoding='utf-8') ]
+        return list(set(input_str_list) - set(stopwords))
 
 if __name__ == '__main__':
     '''
@@ -69,8 +74,11 @@ if __name__ == '__main__':
     result_list = []
     for r in rst:
         r = map(ft.clean_number, r)
-        word_list = (map(ft.clean_special_char, r))
+        word_list = map(ft.clean_special_char, r)
         word_list = list(filter(lambda x: len(x) >= 3 , word_list))
         result_list.extend(ft.lower_en_word(word_list))
 
-    print(set(result_list))
+    result_list = list(set(result_list))
+    result = ft.clean_stopwords(result_list)
+    print(result)
+
